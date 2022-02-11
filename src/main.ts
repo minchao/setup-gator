@@ -1,19 +1,21 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as path from 'path'
+
+import {download, getLatestVersion} from './util'
+
+const toolName = 'gator'
 
 async function run(): Promise<void> {
-  try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+  let version = core.getInput('version', {required: true})
+  if (version.toLocaleLowerCase() === 'latest') {
+    version = await getLatestVersion()
   }
+
+  const cachePatch = await download(toolName, version)
+  core.addPath(path.dirname(cachePatch))
+
+  core.debug(`gator version: '${version}' has been installed at ${cachePatch}`)
+  core.setOutput('gator-path', cachePatch)
 }
 
 run()

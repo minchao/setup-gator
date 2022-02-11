@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
+  "name": "setup-gator",
+  "version": "1.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Set up your GitHub Actions workflow with a specific version of Gatekeeper gator CLI",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -15,24 +15,29 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "https://github.com/minchao/setup-gator.git"
   },
   "keywords": [
     "actions",
-    "node",
+    "gatekeeper",
+    "gator",
     "setup"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.6.0"
+    "@actions/core": "^1.6.0",
+    "@actions/http-client": "^1.0.11",
+    "@actions/tool-cache": "^1.7.1"
   },
   "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "@types/nock": "^11.1.0",
     "@types/node": "^16.10.5",
     "@typescript-eslint/parser": "^5.8.1",
     "@vercel/ncc": "^0.31.1",
-    "eslint": "^7.32.0",
-    "eslint-plugin-github": "^4.3.2",
+    "eslint": "^8.0.1",
+    "eslint-plugin-github": "^4.3.5",
     "eslint-plugin-jest": "^25.3.2",
     "jest": "^27.2.5",
     "js-yaml": "^4.1.0",
