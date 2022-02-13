@@ -1,18 +1,30 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as io from '@actions/io'
+import {download, getLatestVersion} from './util'
+import cp from 'child_process'
+
+const toolName = 'gator'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    let version = core.getInput('version', {required: true})
+    if (version.toLocaleLowerCase() === 'latest') {
+      version = await getLatestVersion()
+    }
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const cachedPath = await download(toolName, version)
+    core.addPath(cachedPath)
 
-    core.setOutput('time', new Date().toTimeString())
+    core.info(
+      `${toolName} version: '${version}' has been installed at ${cachedPath}`
+    )
+    core.setOutput(`${toolName}-path`, cachedPath)
+
+    const toolPath = await io.which(toolName)
+    const toolVersion = (cp.execSync(`${toolPath} --version`) || '').toString()
+    core.info(toolVersion)
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    core.setFailed(error as Error)
   }
 }
 

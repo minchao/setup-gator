@@ -1,11 +1,16 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Set up Gatekeeper gator CLI'
+description: 'Set up your GitHub Actions workflow with a specific version of Gatekeeper gator CLI.'
 inputs:
-  milliseconds: # change this
+  version:
+    description: Version of gator
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    default: latest
+outputs:
+  gator-path:
+    description: Path to the gator binary
+branding:
+  color: blue
+  icon: code
 runs:
   using: 'node12'
   main: 'dist/index.js'
