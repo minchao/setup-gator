@@ -1,4 +1,4 @@
-name: 'Set up Gatekeeper gator CLI'
+name: Setup Gator
 description: 'Set up your GitHub Actions workflow with a specific version of Gatekeeper gator CLI.'
 inputs:
   version:
