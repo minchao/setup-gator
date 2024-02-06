@@ -9,7 +9,7 @@ Set up your GitHub Actions workflow with a specific version of [Gatekeeper gator
 Set up the workflow:
 
 ```yaml
-- uses: minchao/setup-gator@v1
+- uses: minchao/setup-gator@v2
 ```
 
 > default is the latest release.
@@ -17,7 +17,7 @@ Set up the workflow:
 Set up the workflow with a specific version:
 
 ```yaml
-- uses: minchao/setup-gator@v1
+- uses: minchao/setup-gator@v2
   with:
     version: 'v3.7.1'
 ```
@@ -25,7 +25,7 @@ Set up the workflow with a specific version:
 To test the all unit test suites:
 
 ```yaml
-- uses: minchao/setup-gator@v1
+- uses: minchao/setup-gator@v2
 - run: gator test ./...
 ```
 
