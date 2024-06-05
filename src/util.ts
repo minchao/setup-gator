@@ -30,20 +30,31 @@ export async function download(
   return cachedPath
 }
 
+function getArchitecture(): string {
+  const arch = os.arch()
+  switch (arch) {
+    case 'arm64': {
+      return arch
+    }
+    case 'x64': {
+      return 'amd64'
+    }
+    default: {
+      throw new Error(`Unsupported architecture: ${arch}`)
+    }
+  }
+}
+
 function getDownloadURL(toolName: string, version: string): string {
   const baseURL =
     'https://github.com/open-policy-agent/gatekeeper/releases/download/'
-
-  const arch = os.arch()
-  if (arch !== 'x64') {
-    throw new Error(`Unsupported architecture: ${arch}`)
-  }
+  const arch = getArchitecture()
 
   switch (os.type()) {
     case 'Darwin':
-      return `${baseURL}${version}/${toolName}-${version}-darwin-amd64.tar.gz`
+      return `${baseURL}${version}/${toolName}-${version}-darwin-${arch}.tar.gz`
     case 'Linux':
-      return `${baseURL}${version}/${toolName}-${version}-linux-amd64.tar.gz`
+      return `${baseURL}${version}/${toolName}-${version}-linux-${arch}.tar.gz`
     default:
       throw new Error(`Unsupported OS: ${os.type()}`)
   }
