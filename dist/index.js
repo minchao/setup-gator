@@ -39,15 +39,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -57,25 +48,23 @@ const io = __importStar(__nccwpck_require__(4994));
 const util_1 = __nccwpck_require__(7030);
 const child_process_1 = __importDefault(__nccwpck_require__(5317));
 const toolName = 'gator';
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            let version = core.getInput('version', { required: true });
-            if (version.toLocaleLowerCase() === 'latest') {
-                version = yield (0, util_1.getLatestVersion)();
-            }
-            const cachedPath = yield (0, util_1.download)(toolName, version);
-            core.addPath(cachedPath);
-            core.info(`${toolName} version: '${version}' has been installed at ${cachedPath}`);
-            core.setOutput(`${toolName}-path`, cachedPath);
-            const toolPath = yield io.which(toolName);
-            const toolVersion = (child_process_1.default.execSync(`${toolPath} --version`) || '').toString();
-            core.info(toolVersion);
+async function run() {
+    try {
+        let version = core.getInput('version', { required: true });
+        if (version.toLocaleLowerCase() === 'latest') {
+            version = await (0, util_1.getLatestVersion)();
         }
-        catch (error) {
-            core.setFailed(error);
-        }
-    });
+        const cachedPath = await (0, util_1.download)(toolName, version);
+        core.addPath(cachedPath);
+        core.info(`${toolName} version: '${version}' has been installed at ${cachedPath}`);
+        core.setOutput(`${toolName}-path`, cachedPath);
+        const toolPath = await io.which(toolName);
+        const toolVersion = (child_process_1.default.execSync(`${toolPath} --version`) || '').toString();
+        core.info(toolVersion);
+    }
+    catch (error) {
+        core.setFailed(error);
+    }
 }
 run();
 
@@ -120,15 +109,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.download = download;
 exports.getLatestVersion = getLatestVersion;
@@ -136,25 +116,23 @@ const core = __importStar(__nccwpck_require__(7484));
 const httpm = __importStar(__nccwpck_require__(4844));
 const os = __importStar(__nccwpck_require__(857));
 const tc = __importStar(__nccwpck_require__(3472));
-function download(toolName, version) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let cachedPath = tc.find(toolName, version);
-        if (cachedPath) {
-            core.info(`Found in cache ${cachedPath}`);
-            return cachedPath;
-        }
-        core.info(`Attempting to download ${version}`);
-        const downloadURL = getDownloadURL(toolName, version);
-        core.info(`Downloading ${downloadURL}`);
-        const downloadPath = yield tc.downloadTool(downloadURL);
-        core.info(`Downloaded to ${downloadPath}`);
-        const extractedDir = yield extractArchive(downloadPath);
-        core.info(`Extracted to ${extractedDir}`);
-        core.info('Adding to the cache');
-        cachedPath = yield tc.cacheDir(extractedDir, toolName, version);
-        core.info(`Cached to ${cachedPath}`);
+async function download(toolName, version) {
+    let cachedPath = tc.find(toolName, version);
+    if (cachedPath) {
+        core.info(`Found in cache ${cachedPath}`);
         return cachedPath;
-    });
+    }
+    core.info(`Attempting to download ${version}`);
+    const downloadURL = getDownloadURL(toolName, version);
+    core.info(`Downloading ${downloadURL}`);
+    const downloadPath = await tc.downloadTool(downloadURL);
+    core.info(`Downloaded to ${downloadPath}`);
+    const extractedDir = await extractArchive(downloadPath);
+    core.info(`Extracted to ${extractedDir}`);
+    core.info('Adding to the cache');
+    cachedPath = await tc.cacheDir(extractedDir, toolName, version);
+    core.info(`Cached to ${cachedPath}`);
+    return cachedPath;
 }
 function getArchitecture() {
     const arch = os.arch();
@@ -182,30 +160,26 @@ function getDownloadURL(toolName, version) {
             throw new Error(`Unsupported OS: ${os.type()}`);
     }
 }
-function getLatestVersion() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const res = yield new httpm.HttpClient('setup-gator').get('https://api.github.com/repos/open-policy-agent/gatekeeper/releases/latest');
-        if (res.message.statusCode !== 200) {
-            throw new Error(`Failed to get latest version: ${res.message.statusCode}`);
-        }
-        const body = yield res.readBody();
-        let releases;
-        try {
-            releases = JSON.parse(body);
-        }
-        catch (e) {
-            throw new Error(`Failed to parse latest version: ${e}`);
-        }
-        if (!releases.tag_name.startsWith('v')) {
-            throw new Error(`Latest version is not a valid version: ${releases.tag_name}`);
-        }
-        return releases.tag_name;
-    });
+async function getLatestVersion() {
+    const res = await new httpm.HttpClient('setup-gator').get('https://api.github.com/repos/open-policy-agent/gatekeeper/releases/latest');
+    if (res.message.statusCode !== 200) {
+        throw new Error(`Failed to get latest version: ${res.message.statusCode}`);
+    }
+    const body = await res.readBody();
+    let releases;
+    try {
+        releases = JSON.parse(body);
+    }
+    catch (e) {
+        throw new Error(`Failed to parse latest version: ${e}`);
+    }
+    if (!releases.tag_name.startsWith('v')) {
+        throw new Error(`Latest version is not a valid version: ${releases.tag_name}`);
+    }
+    return releases.tag_name;
 }
-function extractArchive(archivePath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield tc.extractTar(archivePath);
-    });
+async function extractArchive(archivePath) {
+    return await tc.extractTar(archivePath);
 }
 
 
