@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - run: npm run all
   test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
@@ -28,6 +29,6 @@ jobs:
           persist-credentials: false
       - uses: ./
         with:
-          version: 'v3.10.0'
+          version: 'v3.22.0'
       - run: |
           gator --version
